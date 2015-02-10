@@ -176,16 +176,35 @@ plot(arrestTab[m]~factor(cctvTab),xlab="Number of CCTV cameras", ylab="Number of
 
 As part of Project 1 you will add to this analysis. Please use the following template:
 
-#### Your name(s) here
+#### Mihai Sirbu
 
 What question are you asking?:
 
+I am trying to answer: at what time are most people arrested? 
+For this prelimary analysis, I plan on making a plot where
+hour is the x-axis and the number of arrest is the y-axis. This 
+will produced an "Arrest Timeseries. 
+
 What is the code you use to answer it?:
 
-```{r yourname}
-plot(1:10,1:10)
-# code goes here
+```{r}
+
+time <- strptime(arrest_tab$arrestTime, "%H:%M")
+arrest_tab$hours <- as.numeric(format(time, "%H"))
+
+hours_df <- as.data.frame(table(arrest_tab$hours))
+names(hours_df) <- c("hour","count")
+
+g <- ggplot(hours_df, aes(hour, count, group=1))+geom_line(color="blue")+geom_point(color="blue")
+g <- g+labs(title = "Arrest Timeseries", x="Time of Day",y="Num of Arrests")
+g <- g+scale_x_discrete(breaks=seq(0,23,2))
+g <- g + theme(plot.title=element_text(size=16,face="bold"),axis.title.x=element_text(size=16,face="bold"),axis.title.y=element_text(size=16,face="bold"))
+g
+
+
 ```
 
 What did you observe?
+
+I had originally thought that there would be very little arrests until 8 pm at which point there would be a giant spike from 8 pm to 5 am. But that was not the case. Instead, the two biggest hours of arrest were 6 pm followed by 10 am (!!). At this point, I'm not entirely sure why that might be. I would be surprised, however, if all offenses followed this exact same pattern. 
 
