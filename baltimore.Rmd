@@ -1,6 +1,6 @@
 A quick analysis of Baltimore crime
 ========================================================
-
+TESTING
 I'm going to do a very simple analysis of Baltimore crime to show off R. We'll use data downloaded from Baltimore City's awesome open data site (this was downloaded a couple of years ago so if you download now, you will get different results). 
 
 ### Getting data
