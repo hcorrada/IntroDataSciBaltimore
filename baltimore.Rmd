@@ -176,7 +176,13 @@ plot(arrestTab[m]~factor(cctvTab),xlab="Number of CCTV cameras", ylab="Number of
 
 As part of Project 1 you will add to this analysis. Please use the following template:
 
-#### Your name(s) here
+#### 2208Jay
+
+##### Group Members
+Praneet Puppala
+Jason Rubin
+Michael Younkin
+Jay Zhang
 
 What question are you asking?:
 
