@@ -179,10 +179,10 @@ As part of Project 1 you will add to this analysis. Please use the following tem
 #### 2208Jay
 
 ##### Group Members
-Praneet Puppala
-Jason Rubin
-Michael Younkin
-Jay Zhang
+* Praneet Puppala
+* Jason Rubin
+* Michael Younkin
+* Jay Zhang
 
 What question are you asking?:
 
