@@ -176,16 +176,58 @@ plot(arrestTab[m]~factor(cctvTab),xlab="Number of CCTV cameras", ylab="Number of
 
 As part of Project 1 you will add to this analysis. Please use the following template:
 
-#### Your name(s) here
+#### Aaron Dugatkin
 
-What question are you asking?:
+What question are you asking?: I am trying to find out how cameras affect the sorts of crimes in their area, both in reducing certain types of crime, or leading to finding more of other types of crime.
 
 What is the code you use to answer it?:
 
-```{r yourname}
-plot(1:10,1:10)
-# code goes here
+```{r aarondugatkin}
+# find all coordinate bins with cameras
+cctvRowTab = data.frame(t(cctvTab))
+camLocs = cctvRowTab[,][2]
+# label arrest records as those with cameras and those without, ignore NA locations
+library(tidyr)
+library(stringr)
+camLocs = separate(camLocs,cctvGridFactor,into = c("lon","lat"), sep = ":")
+tmplat=gsub("\\]","",gsub("\\(","", camLocs $lat))
+tmplat=strsplit(tmplat,split=",")
+camLocs$minlat=as.numeric(sapply(tmplat,function(x) x[1]))
+camLocs$maxlat=as.numeric(sapply(tmplat,function(x) x[2]))
+tmplon=gsub("\\]","",gsub("\\(","", camLocs $lon))
+tmplon =strsplit(tmplon,split=",")
+camLocs$minlon=as.numeric(sapply(tmplon,function(x) x[1]))
+camLocs$maxlon=as.numeric(sapply(tmplon,function(x) x[2]))
+labelDataType <- function(lon, lat, df) {
+  for (i in 1:nrow(df)) {
+    if (lon > df[i,]$minlon & lon <= df[i,]$maxlon & lat > df[i,]$minlat & lat <= df[i,]$maxlat ) {
+		return(2) # label as in camera area
+          break
+      } 
+  }
+  return(1) # label as not in camera area
+}
+arrest_tab = arrest_tab[!is.na(arrest_tab$lat) & !is.na(arrest_tab$lon),]
+for (i in 1:nrow(arrest_tab)) {
+          arrest_tab[i,18] <- labelDataType(arrest_tab[i,]$lon, arrest_tab[i,]$lat, camLocs)
+}
+colnames(arrest_tab)[18] <- "label"
+#create separate tables for crimes in camera and non camera locations, calculate frequency of crimes for each
+camCrimes <- sort(table(arrest_tab[arrest_tab$label == 2,]$incidentOffense),decreasing=TRUE)
+cam_crime_tab <- data.frame(camCrimes)
+cam_crime_tab$names <- rownames(cam_crime_tab)
+cam_crime_tab$campct <- cam_crime_tab$camCrimes/sum(cam_crime_tab$camCrimes)*100
+noCamCrimes <- sort(table(arrest_tab[arrest_tab$label == 1,]$incidentOffense),decreasing=TRUE)
+no_cam_crime_tab <- data.frame(noCamCrimes)
+no_cam_crime_tab $names <- rownames(no_cam_crime_tab)
+no_cam_crime_tab$nocampct <- no_cam_crime_tab $noCamCrimes/sum(no_cam_crime_tab $noCamCrimes)*100
+#merge the two tables, and calculate the difference in crime frequency in the two situations
+crime_tab <- merge(no_cam_crime_tab, cam_crime_tab)
+crime_tab$pctchange <- crime_tab$campct - crime_tab$nocampct
+#display the change in crime frequency with crime name in descending order, with the most increased (caught) crimes first
+crime_tab <- crime_tab[with(crime_tab, order(-pctchange)), ]
+subset(crime_tab, select=c("names", "pctchange"))
 ```
 
-What did you observe?
+What did you observe? The results were interesting. We see a large increase in charges of  narcotics, which may be due to camera surveillance. We also see a decrease in assault, which may be due to the perpetrators of such crimes realizing the dangers of committing such crimes in front of a camera. However, the vast majority of crimes do not even see a 1% change between the two situations, so it would appear as though, overall, cameras do not have a major affect on criminal activity.
 
