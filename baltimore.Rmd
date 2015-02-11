@@ -216,6 +216,11 @@ What is the code you use to answer it?:
 
 ```{r aarondugatkin}
 # modified code from above, to create factors, but remove NA
+
+# added by HCB to restore original arrest table
+arrest_tab_original = arrest_tab
+#
+
 arrest_tab = arrest_tab[!is.na(arrest_tab$lat) & !is.na(arrest_tab$lon),]
 latRange=range(arrest_tab$lat,na.rm=TRUE)
 lonRange=range(arrest_tab$lon,na.rm=TRUE)
@@ -244,6 +249,9 @@ crime_tab$pctchange <- crime_tab$campct - crime_tab$nocampct
 crime_tab <- crime_tab[with(crime_tab, order(-pctchange)), ]
 options(scipen=999)
 subset(crime_tab, select=c("pctchange"))
+
+# added by HCB to restore original arrest table
+arrest_tab = arrest_tab_original
 ```
 
 What did you observe? The results were interesting. We see a large increase in charges of  narcotics, which may be due to camera surveillance. We also see a decrease in assault, which may be due to the perpetrators of such crimes realizing the dangers of committing such crimes in front of a camera. However, the vast majority of crimes do not even see a 1% change between the two situations, so it would appear as though, overall, cameras do not have a major affect on criminal activity.
