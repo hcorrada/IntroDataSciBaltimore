@@ -176,6 +176,38 @@ plot(arrestTab[m]~factor(cctvTab),xlab="Number of CCTV cameras", ylab="Number of
 
 As part of Project 1 you will add to this analysis. Please use the following template:
 
+#### Mihai Sirbu
+
+What question are you asking?:
+
+I am trying to answer: at what time are most people arrested? 
+For this prelimary analysis, I plan on making a plot where
+hour is the x-axis and the number of arrest is the y-axis. This 
+will produced an "Arrest Timeseries. 
+
+What is the code you use to answer it?:
+
+```{r}
+
+time <- strptime(arrest_tab$arrestTime, "%H:%M")
+arrest_tab$hours <- as.numeric(format(time, "%H"))
+
+hours_df <- as.data.frame(table(arrest_tab$hours))
+names(hours_df) <- c("hour","count")
+
+g <- ggplot(hours_df, aes(hour, count, group=1))+geom_line(color="blue")+geom_point(color="blue")
+g <- g+labs(title = "Arrest Timeseries", x="Time of Day",y="Num of Arrests")
+g <- g+scale_x_discrete(breaks=seq(0,23,2))
+g <- g + theme(plot.title=element_text(size=16,face="bold"),axis.title.x=element_text(size=16,face="bold"),axis.title.y=element_text(size=16,face="bold"))
+g
+
+
+```
+
+What did you observe?
+
+I had originally thought that there would be very little arrests until 8 pm at which point there would be a giant spike from 8 pm to 5 am. But that was not the case. Instead, the two biggest hours of arrest were 6 pm followed by 10 am (!!). At this point, I'm not entirely sure why that might be. I would be surprised, however, if all offenses followed this exact same pattern. 
+
 #### Aaron Dugatkin
 
 What question are you asking?: I am trying to find out how cameras affect the sorts of crimes in their area, both in reducing certain types of crime, or leading to finding more of other types of crime.
@@ -183,50 +215,35 @@ What question are you asking?: I am trying to find out how cameras affect the so
 What is the code you use to answer it?:
 
 ```{r aarondugatkin}
-# find all coordinate bins with cameras
-cctvRowTab = data.frame(t(cctvTab))
-camLocs = cctvRowTab[,][2]
-# label arrest records as those with cameras and those without, ignore NA locations
-library(tidyr)
-library(stringr)
-camLocs = separate(camLocs,cctvGridFactor,into = c("lon","lat"), sep = ":")
-tmplat=gsub("\\]","",gsub("\\(","", camLocs $lat))
-tmplat=strsplit(tmplat,split=",")
-camLocs$minlat=as.numeric(sapply(tmplat,function(x) x[1]))
-camLocs$maxlat=as.numeric(sapply(tmplat,function(x) x[2]))
-tmplon=gsub("\\]","",gsub("\\(","", camLocs $lon))
-tmplon =strsplit(tmplon,split=",")
-camLocs$minlon=as.numeric(sapply(tmplon,function(x) x[1]))
-camLocs$maxlon=as.numeric(sapply(tmplon,function(x) x[2]))
-labelDataType <- function(lon, lat, df) {
-  for (i in 1:nrow(df)) {
-    if (lon > df[i,]$minlon & lon <= df[i,]$maxlon & lat > df[i,]$minlat & lat <= df[i,]$maxlat ) {
-		return(2) # label as in camera area
-          break
-      } 
-  }
-  return(1) # label as not in camera area
-}
+# modified code from above, to create factors, but remove NA
 arrest_tab = arrest_tab[!is.na(arrest_tab$lat) & !is.na(arrest_tab$lon),]
-for (i in 1:nrow(arrest_tab)) {
-          arrest_tab[i,18] <- labelDataType(arrest_tab[i,]$lon, arrest_tab[i,]$lat, camLocs)
-}
-colnames(arrest_tab)[18] <- "label"
-#create separate tables for crimes in camera and non camera locations, calculate frequency of crimes for each
-camCrimes <- sort(table(arrest_tab[arrest_tab$label == 2,]$incidentOffense),decreasing=TRUE)
-cam_crime_tab <- data.frame(camCrimes)
-cam_crime_tab$names <- rownames(cam_crime_tab)
-cam_crime_tab$campct <- cam_crime_tab$camCrimes/sum(cam_crime_tab$camCrimes)*100
-noCamCrimes <- sort(table(arrest_tab[arrest_tab$label == 1,]$incidentOffense),decreasing=TRUE)
-no_cam_crime_tab <- data.frame(noCamCrimes)
-no_cam_crime_tab $names <- rownames(no_cam_crime_tab)
-no_cam_crime_tab$nocampct <- no_cam_crime_tab $noCamCrimes/sum(no_cam_crime_tab $noCamCrimes)*100
+latRange=range(arrest_tab$lat,na.rm=TRUE)
+lonRange=range(arrest_tab$lon,na.rm=TRUE)
+latGrid=seq(min(latRange),max(latRange),len=50)
+latFactor=cut(arrest_tab$lat,breaks=latGrid)
+lonGrid=seq(min(lonRange),max(lonRange),len=50)
+lonFactor=cut(arrest_tab$lon,breaks=lonGrid)
+gridFactor=factor(paste(lonFactor,latFactor,sep=":"))
+latFactor=cut(cctv_tab$lat,breaks=latGrid)
+lonFactor=cut(cctv_tab$lon,breaks=lonGrid)
+cctvGridFactor=factor(paste(lonFactor,latFactor,sep=":"))
+arrestTab=table(gridFactor)
+cctvTab=table(cctvGridFactor)
+#count crimes in areas with and without camera
+arrestOnCamera = gridFactor %in% names(cctvTab)
+count_crime_tab <- table(arrest_tab$incidentOffense, arrestOnCamera)
 #merge the two tables, and calculate the difference in crime frequency in the two situations
-crime_tab <- merge(no_cam_crime_tab, cam_crime_tab)
+crime_tab <- data.frame(count_crime_tab[,1], count_crime_tab[,2])
+colnames(crime_tab)[1] <- "noCamCrimes"
+colnames(crime_tab)[2] <- "camCrimes"
+crime_tab$names <- rownames(crime_tab)
+crime_tab$campct <- crime_tab$camCrimes/sum(crime_tab$camCrimes)*100
+crime_tab$nocampct <- crime_tab$noCamCrimes/sum(crime_tab$noCamCrimes)*100
 crime_tab$pctchange <- crime_tab$campct - crime_tab$nocampct
 #display the change in crime frequency with crime name in descending order, with the most increased (caught) crimes first
 crime_tab <- crime_tab[with(crime_tab, order(-pctchange)), ]
-subset(crime_tab, select=c("names", "pctchange"))
+options(scipen=999)
+subset(crime_tab, select=c("pctchange"))
 ```
 
 What did you observe? The results were interesting. We see a large increase in charges of  narcotics, which may be due to camera surveillance. We also see a decrease in assault, which may be due to the perpetrators of such crimes realizing the dangers of committing such crimes in front of a camera. However, the vast majority of crimes do not even see a 1% change between the two situations, so it would appear as though, overall, cameras do not have a major affect on criminal activity.
