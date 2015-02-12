@@ -164,6 +164,59 @@ plot(arrestTab[m]~factor(cctvTab),xlab="Number of CCTV cameras", ylab="Number of
 
 ### Extra analyses
 
+What did you observe?
+
+I had originally thought that there would be very little arrests until 8 pm at which point there would be a giant spike from 8 pm to 5 am. But that was not the case. Instead, the two biggest hours of arrest were 6 pm followed by 10 am (!!). At this point, I'm not entirely sure why that might be. I would be surprised, however, if all offenses followed this exact same pattern. 
+
+#### Aaron Dugatkin
+
+What question are you asking?: I am trying to find out how cameras affect the sorts of crimes in their area, both in reducing certain types of crime, or leading to finding more of other types of crime.
+
+What is the code you use to answer it?:
+
+```{r aarondugatkin}
+# modified code from above, to create factors, but remove NA
+
+# added by HCB to restore original arrest table
+arrest_tab_original = arrest_tab
+#
+
+arrest_tab = arrest_tab[!is.na(arrest_tab$lat) & !is.na(arrest_tab$lon),]
+latRange=range(arrest_tab$lat,na.rm=TRUE)
+lonRange=range(arrest_tab$lon,na.rm=TRUE)
+latGrid=seq(min(latRange),max(latRange),len=50)
+latFactor=cut(arrest_tab$lat,breaks=latGrid)
+lonGrid=seq(min(lonRange),max(lonRange),len=50)
+lonFactor=cut(arrest_tab$lon,breaks=lonGrid)
+gridFactor=factor(paste(lonFactor,latFactor,sep=":"))
+latFactor=cut(cctv_tab$lat,breaks=latGrid)
+lonFactor=cut(cctv_tab$lon,breaks=lonGrid)
+cctvGridFactor=factor(paste(lonFactor,latFactor,sep=":"))
+arrestTab=table(gridFactor)
+cctvTab=table(cctvGridFactor)
+#count crimes in areas with and without camera
+arrestOnCamera = gridFactor %in% names(cctvTab)
+count_crime_tab <- table(arrest_tab$incidentOffense, arrestOnCamera)
+#merge the two tables, and calculate the difference in crime frequency in the two situations
+crime_tab <- data.frame(count_crime_tab[,1], count_crime_tab[,2])
+colnames(crime_tab)[1] <- "noCamCrimes"
+colnames(crime_tab)[2] <- "camCrimes"
+crime_tab$names <- rownames(crime_tab)
+crime_tab$campct <- crime_tab$camCrimes/sum(crime_tab$camCrimes)*100
+crime_tab$nocampct <- crime_tab$noCamCrimes/sum(crime_tab$noCamCrimes)*100
+crime_tab$pctchange <- crime_tab$campct - crime_tab$nocampct
+#display the change in crime frequency with crime name in descending order, with the most increased (caught) crimes first
+crime_tab <- crime_tab[with(crime_tab, order(-pctchange)), ]
+options(scipen=999)
+subset(crime_tab, select=c("pctchange"))
+
+# added by HCB to restore original arrest table
+arrest_tab = arrest_tab_original
+```
+
+What did you observe? The results were interesting. We see a large increase in charges of  narcotics, which may be due to camera surveillance. We also see a decrease in assault, which may be due to the perpetrators of such crimes realizing the dangers of committing such crimes in front of a camera. However, the vast majority of crimes do not even see a 1% change between the two situations, so it would appear as though, overall, cameras do not have a major affect on criminal activity.
+
+
 #### Zach Jiroun Des Chandhok Jose Zamora
 
 What question are you asking?:
@@ -172,7 +225,7 @@ On what day were the most arrests made?
 
 What is the code you use to answer it?:
 
-```{r Zach Jiroun Des Chandhok Jose Zamora}
+```{r Zach Jiroun, Des Chandhok, Jose Zamora}
 head(sort(table(arrest_tab$arrestDate), decreasing=TRUE))
 ```
 
