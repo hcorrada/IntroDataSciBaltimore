@@ -191,7 +191,7 @@ will produced an "Arrest Timeseries.
 
 What is the code you use to answer it?:
 
-```{r}
+```{r surbu}
 
 time <- strptime(arrest_tab$arrestTime, "%H:%M")
 arrest_tab$hours <- as.numeric(format(time, "%H"))
@@ -260,6 +260,7 @@ arrest_tab = arrest_tab_original
 
 What did you observe? The results were interesting. We see a large increase in charges of  narcotics, which may be due to camera surveillance. We also see a decrease in assault, which may be due to the perpetrators of such crimes realizing the dangers of committing such crimes in front of a camera. However, the vast majority of crimes do not even see a 1% change between the two situations, so it would appear as though, overall, cameras do not have a major affect on criminal activity.
 
+<<<<<<< HEAD
 #### Your name(s) here
 Anna Petrone
 
@@ -377,3 +378,67 @@ The results: As could probably be expected, the highest number of arrests occure
 
 For future analysis, it would be good to create a similar plot where the colors represent neighborhood income level. I would also like to add a layer showing the locations of transit stations, since these are commonly believed to attract crime. 
 
+=======
+
+#### Raul Alfaro
+
+
+What question are you asking?: Which is the most common crime per race?
+
+What is the code you use to answer it?:
+
+```{r RaulAlfaro}
+head(sort(table(arrest_tab$incidentOffense[arrest_tab$race=="A"]),decreasing=TRUE))
+head(sort(table(arrest_tab$incidentOffense[arrest_tab$race=="B"]),decreasing=TRUE))
+head(sort(table(arrest_tab$incidentOffense[arrest_tab$race=="H"]),decreasing=TRUE))
+head(sort(table(arrest_tab$incidentOffense[arrest_tab$race=="I"]),decreasing=TRUE))
+head(sort(table(arrest_tab$incidentOffense[arrest_tab$race=="U"]),decreasing=TRUE))
+head(sort(table(arrest_tab$incidentOffense[arrest_tab$race=="W"]),decreasing=TRUE))
+```
+
+What did you observe?
+I observed asside from the Unknown Offenses the most common crime for all races but 1 was Narcotics, the "race" had common Assault as their most common crime.
+
+
+
+#### Kim St. Andrie, Rain Surasorn
+
+What question are you asking?:
+  Which year had the largest number of arrests?
+
+What is the code you use to answer it?:
+
+```{r KimRain}
+a <- data.frame(id = arrest_tab$arrest, year = substr(arrest_tab$arrestDate,7,11))
+head(sort(table(a$year), decreasing=TRUE),10)
+
+```
+
+What did you observe? 
+  2011 had the largest number of arrests but there was no dramatic difference between the number of arrests for each year.  There were 52,868 arrests in 2011 which was 1208 more than the number of arrests for 2012.  
+
+
+#### Rentao Wu
+
+What are you asking:
+
+I wanted to know if the ratio of female to male crime rates are similar accross the difference races.
+
+What is the code you used to answer it?
+
+```{r}
+mytab = table(race=arrest_tab$race, sex=arrest_tab$sex)
+#mydf$V1 = NULL
+mydf = as.data.frame.matrix(mytab) 
+mydf$ratio = mydf$F/mydf$M
+mydf$ratio <- round(mydf$ratio, 3)
+mydf = mydf[-1,]
+mydf
+mydf$race <- c("A","B","H","I","U","W")
+
+ggplot(data=mydf, aes(x=race, y=ratio, fill=race)) + geom_bar(stat="identity")
+```
+
+What are your observations?
+I found out that for most race, the ratio of female to male crime rates is about 0.2. This tells us that there are about 1 female for ever 5 male criminal offenses. I also saw that the female to male crime ratio for the white population is about 0.43 which is much higher than the others. 
+>>>>>>> upstream/master
