@@ -260,3 +260,32 @@ arrest_tab = arrest_tab_original
 
 What did you observe? The results were interesting. We see a large increase in charges of  narcotics, which may be due to camera surveillance. We also see a decrease in assault, which may be due to the perpetrators of such crimes realizing the dangers of committing such crimes in front of a camera. However, the vast majority of crimes do not even see a 1% change between the two situations, so it would appear as though, overall, cameras do not have a major affect on criminal activity.
 
+#### Krishna Pai
+
+What question are you asking?: Do police officers go out of their way to arrest more black people than white people?
+
+What is the code you use to answer it?:
+
+```{r }
+library(ggplot2)
+arrest_tab=read.csv("BPD_Arrests.csv", stringsAsFactors=FALSE)
+tmp=arrest_tab$sex
+arrest_tab$sex=arrest_tab$race
+arrest_tab$race=tmp
+police_tab=read.csv("Police_Stations.csv", stringsAsFactors=FALSE)
+tmp=gsub("\\)","",gsub("\\(","",arrest_tab$Location))
+tmp=strsplit(tmp,split=",")
+arrest_tab$lon=as.numeric(sapply(tmp,function(x) x[2]))
+arrest_tab$lat=as.numeric(sapply(tmp,function(x) x[1]))
+tmp=gsub("\\)","",gsub("\\(","",police_tab$Location))
+tmp=strsplit(tmp,split=",")
+police_tab$lon=as.numeric(sapply(tmp,function(x) x[2])) 
+police_tab$lat=as.numeric(sapply(tmp,function(x) x[1])) 
+plt=ggplot()
+plt=plt+geom_point(data=arrest_tab[arrest_tab$race=='B',],aes(x=lon,y=lat),color="black",alpha=.1)
+plt=plt+geom_point(data=arrest_tab[arrest_tab$race=='W',],aes(x=lon,y=lat),color="white",alpha=.1)
+plt=plt+geom_point(data=police_tab,aes(x=lon,y=lat),color="red")
+print(plt)
+```
+
+What did you observe? I was surprised to find that most of the arrests made some distance away from the cluster of police stations were for white people. It would be interesting to investigate what kinds of crimes might have been committed so far away from the stations, and why white people stand out as being arrested at that distance, especially in the east.
