@@ -473,6 +473,17 @@ arrest_tab = arrest_tab_original</code></pre>
 ##                     740                     671                     528</code></pre>
 <p>What did you observe? I observed asside from the Unknown Offenses the most common crime for all races but 1 was Narcotics, the “race” had common Assault as their most common crime.</p>
 </div>
+<div id="kim-st.andrie-rain-surasorn" class="section level4">
+<h4>Kim St. Andrie, Rain Surasorn</h4>
+<p>What question are you asking?: Which year had the largest number of arrests?</p>
+<p>What is the code you use to answer it?:</p>
+<pre class="r"><code>a &lt;- data.frame(id = arrest_tab$arrest, year = substr(arrest_tab$arrestDate,7,11))
+head(sort(table(a$year), decreasing=TRUE),10)</code></pre>
+<pre><code>## 
+##  2011  2012 
+## 52868 51660</code></pre>
+<p>What did you observe? 2011 had the largest number of arrests but there was no dramatic difference between the number of arrests for each year. There were 52,868 arrests in 2011 which was 1208 more than the number of arrests for 2012.</p>
+</div>
 </div>
 </div>
 
