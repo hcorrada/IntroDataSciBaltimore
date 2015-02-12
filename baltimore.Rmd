@@ -1,6 +1,10 @@
 A quick analysis of Baltimore crime
 ========================================================
 
+```{r setup, echo=FALSE}
+knitr::opts_chunk$set(cache=TRUE)
+```
+
 I'm going to do a very simple analysis of Baltimore crime to show off R. We'll use data downloaded from Baltimore City's awesome open data site (this was downloaded a couple of years ago so if you download now, you will get different results). 
 
 ### Getting data
@@ -175,6 +179,298 @@ plot(arrestTab[m]~factor(cctvTab),xlab="Number of CCTV cameras", ylab="Number of
 ### Extra analyses
 
 As part of Project 1 you will add to this analysis. Please use the following template:
+
+#### Mihai Sirbu
+
+What question are you asking?:
+
+I am trying to answer: at what time are most people arrested? 
+For this prelimary analysis, I plan on making a plot where
+hour is the x-axis and the number of arrest is the y-axis. This 
+will produced an "Arrest Timeseries. 
+
+What is the code you use to answer it?:
+
+```{r surbu}
+
+time <- strptime(arrest_tab$arrestTime, "%H:%M")
+arrest_tab$hours <- as.numeric(format(time, "%H"))
+
+hours_df <- as.data.frame(table(arrest_tab$hours))
+names(hours_df) <- c("hour","count")
+
+g <- ggplot(hours_df, aes(hour, count, group=1))+geom_line(color="blue")+geom_point(color="blue")
+g <- g+labs(title = "Arrest Timeseries", x="Time of Day",y="Num of Arrests")
+g <- g+scale_x_discrete(breaks=seq(0,23,2))
+g <- g + theme(plot.title=element_text(size=16,face="bold"),axis.title.x=element_text(size=16,face="bold"),axis.title.y=element_text(size=16,face="bold"))
+g
+
+
+```
+
+What did you observe?
+
+I had originally thought that there would be very little arrests until 8 pm at which point there would be a giant spike from 8 pm to 5 am. But that was not the case. Instead, the two biggest hours of arrest were 6 pm followed by 10 am (!!). At this point, I'm not entirely sure why that might be. I would be surprised, however, if all offenses followed this exact same pattern. 
+
+#### Aaron Dugatkin
+
+What question are you asking?: I am trying to find out how cameras affect the sorts of crimes in their area, both in reducing certain types of crime, or leading to finding more of other types of crime.
+
+What is the code you use to answer it?:
+
+```{r aarondugatkin}
+# modified code from above, to create factors, but remove NA
+
+# added by HCB to restore original arrest table
+arrest_tab_original = arrest_tab
+#
+
+arrest_tab = arrest_tab[!is.na(arrest_tab$lat) & !is.na(arrest_tab$lon),]
+latRange=range(arrest_tab$lat,na.rm=TRUE)
+lonRange=range(arrest_tab$lon,na.rm=TRUE)
+latGrid=seq(min(latRange),max(latRange),len=50)
+latFactor=cut(arrest_tab$lat,breaks=latGrid)
+lonGrid=seq(min(lonRange),max(lonRange),len=50)
+lonFactor=cut(arrest_tab$lon,breaks=lonGrid)
+gridFactor=factor(paste(lonFactor,latFactor,sep=":"))
+latFactor=cut(cctv_tab$lat,breaks=latGrid)
+lonFactor=cut(cctv_tab$lon,breaks=lonGrid)
+cctvGridFactor=factor(paste(lonFactor,latFactor,sep=":"))
+arrestTab=table(gridFactor)
+cctvTab=table(cctvGridFactor)
+#count crimes in areas with and without camera
+arrestOnCamera = gridFactor %in% names(cctvTab)
+count_crime_tab <- table(arrest_tab$incidentOffense, arrestOnCamera)
+#merge the two tables, and calculate the difference in crime frequency in the two situations
+crime_tab <- data.frame(count_crime_tab[,1], count_crime_tab[,2])
+colnames(crime_tab)[1] <- "noCamCrimes"
+colnames(crime_tab)[2] <- "camCrimes"
+crime_tab$names <- rownames(crime_tab)
+crime_tab$campct <- crime_tab$camCrimes/sum(crime_tab$camCrimes)*100
+crime_tab$nocampct <- crime_tab$noCamCrimes/sum(crime_tab$noCamCrimes)*100
+crime_tab$pctchange <- crime_tab$campct - crime_tab$nocampct
+#display the change in crime frequency with crime name in descending order, with the most increased (caught) crimes first
+crime_tab <- crime_tab[with(crime_tab, order(-pctchange)), ]
+options(scipen=999)
+subset(crime_tab, select=c("pctchange"))
+
+# added by HCB to restore original arrest table
+arrest_tab = arrest_tab_original
+```
+
+What did you observe? The results were interesting. We see a large increase in charges of  narcotics, which may be due to camera surveillance. We also see a decrease in assault, which may be due to the perpetrators of such crimes realizing the dangers of committing such crimes in front of a camera. However, the vast majority of crimes do not even see a 1% change between the two situations, so it would appear as though, overall, cameras do not have a major affect on criminal activity.
+
+#### Anna Petrone
+
+What question are you asking?:
+Which neighborhoods in Baltimore have the higest number of arrests?
+
+What is the code you use to answer it?:
+
+Load libraries
+```{r AnnaPetrone:libs}
+
+library(rgdal) # needed for reading shape files
+library(plyr) # needed for rename function
+library(sp) # needed for point.in.polygon function 
+library(ggmap) # could use for geocoding addresses
+library(ggplot2) # needed for plotting
+```
+
+Find number of arrests for which the geo coordinates weren't given
+```{r AnnaPetrone:nogeo} 
+no.geo.idx = nchar(arrest_tab$Location.1) == 0
+n.geo.missing = sum( no.geo.idx )
+narrests = dim(arrest_tab)[1]
+n.geo.missing/narrests*100 # 39%
+```
+
+Find the number of incidents who dont have geo code info, but the incidentLocation is provided
+```{r AnnaPetrone:nogeo_butloc} 
+has.location = nchar(arrest_tab$incidentLocation) > 0 
+sum(no.geo.idx & has.location)
+
+```
+
+```{r AnnaPetrone:geocode}
+#tmp = paste(arrest_tab$incidentLocation[no.geo.idx & has.location], "Baltimore, MD")
+#gc = geocode(tmp[1:2490]) # restricted to 2500 api requests per day
+```
+
+
+Get the 2010 statistical community areas [here](http://bniajfi.org/mapping-resources/)
+  Download the shape files and extract from the .zip file
+```{r AnnaPetrone:getshape} 
+setwd("csa_2010_boundaries/")
+csa = readOGR(dsn=".",layer="CSA_NSA_Tracts")
+csa.df = fortify(csa) # fortify turns the shape data into a data.frame
+csa.df = rename(csa.df, c("long"="X.feet","lat"="Y.feet")) # MD uses State Plane coords instead of lat/lon (see comments section)
+
+convert = FALSE
+if (convert){ # write a file to send to matlab code (described in comments section)
+  write.csv(csa.df[,c("lat","lon")], "csa-df.txt",  quote=FALSE, na="",row.names=FALSE)
+}
+csa.converted.df = read.csv("csa-df_converted.txt",header=FALSE) # output of the matlab code, converted to lat/lon
+setwd("..")
+
+csa.converted.df = rename(csa.converted.df, c("V1"="lat","V2"="lon"))
+csa.df = cbind(csa.df, csa.converted.df)
+```
+
+Now assign each of the arrest records to a neighborhood
+  but this is only possible for the records that have geo info. 
+  This step takes about 15-20 seconds
+```{r AnnaPetrone:assign} 
+ncsa = dim(csa)[1]
+arrest_tab_geo = arrest_tab[!no.geo.idx,]
+narrests.geo = dim(arrest_tab_geo)[1]
+
+arrest_nbhd_id = vector(length = narrests.geo)
+
+for (j in 1:ncsa) { # takes about 30 sec
+  idx = csa.df$id == j-1
+  polyx = csa.df$lon[idx]
+  polyy = csa.df$lat[idx]
+  
+  in.poly = point.in.polygon(arrest_tab_geo$lon, arrest_tab_geo$lat, polyx,polyy)
+  in.poly= as.logical(in.poly)
+  arrest_nbhd_id[in.poly] = j - 1
+
+}
+
+arrest_tab_geo = cbind(arrest_tab_geo, arrest_nbhd_id)
+```
+
+For each neighborhood, count the number of arrests, using the table function
+```{r AnnaPetrone:narrests} 
+nbhd.narrests = as.data.frame(table(arrest_nbhd_id))
+nbhd.narrests = rename(nbhd.narrests, c("arrest_nbhd_id"="id", "Freq"="narrests"))
+nbhd.names= as.vector(csa$Neigh)
+nbhd.narrests = cbind(nbhd.names, nbhd.narrests)
+head(nbhd.narrests)
+```
+
+Merge the arrest counts with the geometry data
+```{r AnnaPetrone:narrests.merge} 
+csa.df = merge(csa.df, nbhd.narrests, by="id",all.x=TRUE)
+```
+
+Make a plot colored by number of arrests
+```{r AnnaPetrone_plot} 
+g = ggplot(csa.df,aes(x=lon,y=lat,group=group))   
+g = g + geom_polygon(aes(fill=narrests)) + scale_fill_gradient(low="slategray1",high="slateblue4") # color the nbhds by narrests
+g = g + geom_path(colour="gray75",size=.1) # draw lines separating the neighborhoods
+g = g + ggtitle("Baltimore City Arrests 2011 - 2012") # add a title
+g = g + theme(axis.ticks = element_blank(), axis.text.x = element_blank(), axis.text.y = element_blank(), 
+              axis.title.x = element_blank(), axis.title.y = element_blank()) # remove axis labels
+print(g)
+```
+
+What did you observe?
+First, it should be noted that out of the 104,528 arrest records, 40,636 of them (about 39%) did not have geocoded locations (latitude and longitude). Some of them (7,650) did have and adress in the incidentLocation field, so it would be possible to geocode these, though it would not contribute enormously. (I did however take a look at the ggmap library which can convert an address string into lat and lon by calling the google maps geocoding API, however it only allows 2,500 requests per day.) Therefore my analysis only includes the 61% of records which provided geocoded information.
+
+Second, I need to note that it was a pain converting from the [MD State Plane coordinates](http://en.wikipedia.org/wiki/State_Plane_Coordinate_System) into longitude and latitude. I ended up using [an external matlab function](http://www.mathworks.com/matlabcentral/fileexchange/26413-sp-proj) to do the conversion, since it seemed really confusing to do in R. 
+
+The results: As could probably be expected, the highest number of arrests occured in the downtown area, with the northwest area being notably high as well. The inner harbor neighborhood is among the lowest which makes sense as this area is more touristy. The neighborhoods in the central northern neighborhoods are also on the low end (I don't know Baltiore but I'm guessing these are higher income neighborhoods).
+
+For future analysis, it would be good to create a similar plot where the colors represent neighborhood income level. I would also like to add a layer showing the locations of transit stations, since these are commonly believed to attract crime. 
+
+#### Raul Alfaro
+
+
+What question are you asking?: Which is the most common crime per race?
+
+What is the code you use to answer it?:
+
+```{r RaulAlfaro}
+head(sort(table(arrest_tab$incidentOffense[arrest_tab$race=="A"]),decreasing=TRUE))
+head(sort(table(arrest_tab$incidentOffense[arrest_tab$race=="B"]),decreasing=TRUE))
+head(sort(table(arrest_tab$incidentOffense[arrest_tab$race=="H"]),decreasing=TRUE))
+head(sort(table(arrest_tab$incidentOffense[arrest_tab$race=="I"]),decreasing=TRUE))
+head(sort(table(arrest_tab$incidentOffense[arrest_tab$race=="U"]),decreasing=TRUE))
+head(sort(table(arrest_tab$incidentOffense[arrest_tab$race=="W"]),decreasing=TRUE))
+```
+
+What did you observe?
+I observed asside from the Unknown Offenses the most common crime for all races but 1 was Narcotics, the "race" had common Assault as their most common crime.
+
+
+
+#### Kim St. Andrie, Rain Surasorn
+
+What question are you asking?:
+  Which year had the largest number of arrests?
+
+What is the code you use to answer it?:
+
+```{r KimRain}
+a <- data.frame(id = arrest_tab$arrest, year = substr(arrest_tab$arrestDate,7,11))
+head(sort(table(a$year), decreasing=TRUE),10)
+
+```
+
+What did you observe? 
+  2011 had the largest number of arrests but there was no dramatic difference between the number of arrests for each year.  There were 52,868 arrests in 2011 which was 1208 more than the number of arrests for 2012.  
+
+
+#### Rentao Wu
+
+What are you asking:
+
+I wanted to know if the ratio of female to male crime rates are similar accross the difference races.
+
+What is the code you used to answer it?
+
+```{r}
+mytab = table(race=arrest_tab$race, sex=arrest_tab$sex)
+#mydf$V1 = NULL
+mydf = as.data.frame.matrix(mytab) 
+mydf$ratio = mydf$F/mydf$M
+mydf$ratio <- round(mydf$ratio, 3)
+mydf = mydf[-1,]
+mydf
+mydf$race <- c("A","B","H","I","U","W")
+
+ggplot(data=mydf, aes(x=race, y=ratio, fill=race)) + geom_bar(stat="identity")
+```
+
+What are your observations?
+I found out that for most race, the ratio of female to male crime rates is about 0.2. This tells us that there are about 1 female for ever 5 male criminal offenses. I also saw that the female to male crime ratio for the white population is about 0.43 which is much higher than the others. 
+
+#### Krishna Pai
+
+What question are you asking?: Do police officers go out of their way to arrest more black people than white people?
+
+What is the code you use to answer it?:
+
+```{r kpai}
+library(ggplot2)
+# added by HCB to not dirty global environment
+kpai=function()
+  {
+    arrest_tab=read.csv("BPD_Arrests.csv", stringsAsFactors=FALSE)
+    tmp=arrest_tab$sex
+    arrest_tab$sex=arrest_tab$race
+    arrest_tab$race=tmp
+    police_tab=read.csv("Police_Stations.csv", stringsAsFactors=FALSE)
+    tmp=gsub("\\)","",gsub("\\(","",arrest_tab$Location))
+    tmp=strsplit(tmp,split=",")
+    arrest_tab$lon=as.numeric(sapply(tmp,function(x) x[2]))
+    arrest_tab$lat=as.numeric(sapply(tmp,function(x) x[1]))
+    tmp=gsub("\\)","",gsub("\\(","",police_tab$Location))
+    tmp=strsplit(tmp,split=",")
+    police_tab$lon=as.numeric(sapply(tmp,function(x) x[2])) 
+    police_tab$lat=as.numeric(sapply(tmp,function(x) x[1])) 
+    plt=ggplot()
+    plt=plt+geom_point(data=arrest_tab[arrest_tab$race=='B',],aes(x=lon,y=lat),color="black",alpha=.1)
+    plt=plt+geom_point(data=arrest_tab[arrest_tab$race=='W',],aes(x=lon,y=lat),color="white",alpha=.1)
+    plt=plt+geom_point(data=police_tab,aes(x=lon,y=lat),color="red")
+    print(plt)
+  }
+kpai()
+```
+
+What did you observe? I was surprised to find that most of the arrests made some distance away from the cluster of police stations were for white people. It would be interesting to investigate what kinds of crimes might have been committed so far away from the stations, and why white people stand out as being arrested at that distance, especially in the east.
 
 #### 2208Jay
 
