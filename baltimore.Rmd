@@ -182,16 +182,62 @@ As part of Project 1 you will add to this analysis. Please use the following tem
 * Praneet Puppala
 * Jason Rubin
 * Michael Younkin
-* Jay Zhang
+* Haoyue (Jay) Zhang
 
-What question are you asking?:
+###### What question are you asking?:
 
-What is the code you use to answer it?:
+Is there a correlation between arrest location and the locations of vacant
+buildings?
 
-```{r yourname}
-plot(1:10,1:10)
-# code goes here
+###### What is the code you use to answer it?:
+
+```{r 2208Jay}
+# Read in the larger arrests dataset
+bpd <- read.csv("BPD_Arrests.csv", header=TRUE)
+
+# Convert the ArrestDate column
+bpd$ArrestDate <- as.Date(bpd$ArrestDate, "%m/%d/%Y")
+
+# Remove old arrests and arrests without reported locations
+bpd <- subset(bpd, ArrestDate>="2015-01-01")
+bpd <- subset(bpd, bpd$Location.1 != "")
+
+# Read in the vacant buildings dataset
+vacantBldgs = read.csv("Vacant_Buildings.csv", stringsAsFactors=FALSE,
+header=TRUE)
+
+# Remove rows without a location
+vacantBldgs <- subset(vacantBldgs, vacantBldgs, vacantBldgs$Location.1 != "")
+
+# Extract lat and lon into numeric columns
+tmp = vacantBldgs$Location.1
+tmp=gsub("\\)","",gsub("\\(","",vacantBldgs$Location.1))
+tmp=strsplit(tmp, split=", ")
+vacantBldgs$lon=as.numeric(sapply(tmp,function(x) x[2]))
+vacantBldgs$lat=as.numeric(sapply(tmp,function(x) x[1]))
+
+tmp = recentArrests$Location.1
+tmp=gsub("\\)","",gsub("\\(","",recentArrests$Location.1))
+tmp=strsplit(tmp, split=", ")
+recentArrests$lon=as.numeric(sapply(tmp,function(x) x[2]))
+recentArrests$lat=as.numeric(sapply(tmp,function(x) x[1]))
+
+balto_map = subset(map_data("county", region="maryland"),subregion=="baltimore
+city")
+plt=ggplot()
+plt=plt+geom_polygon(data=balto_map,aes(x=long,y=lat),color="black",fill="gray40")
+plt=plt+geom_point(data=vacantBldgs,aes(x=lon,y=lat),color="blue",alpha=.1)
+plt=plt+geom_point(data=recentArrests,aes(x=lon,y=lat),color="red",alpha=.1)
+print(plt)
 ```
 
-What did you observe?
+##### What did you observe?
 
+Based on the plot we produced, we observe that arrests are more concentrated
+around areas with vacant buildings.
+
+Note: because there were no dates associated with when buildings became vacant
+(the data is updated twice a month), we used arrest records from the month of
+January 2015 to minimize the number of "extra" vacant buildings. We assume that
+there was not a significant number of new vacant buildings added since the month
+of January.
