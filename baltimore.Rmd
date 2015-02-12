@@ -436,3 +436,34 @@ ggplot(data=mydf, aes(x=race, y=ratio, fill=race)) + geom_bar(stat="identity")
 
 What are your observations?
 I found out that for most race, the ratio of female to male crime rates is about 0.2. This tells us that there are about 1 female for ever 5 male criminal offenses. I also saw that the female to male crime ratio for the white population is about 0.43 which is much higher than the others. 
+
+#### Krishna Pai
+
+What question are you asking?: Do police officers go out of their way to arrest more black people than white people?
+
+What is the code you use to answer it?:
+
+```{r }
+library(ggplot2)
+arrest_tab=read.csv("BPD_Arrests.csv", stringsAsFactors=FALSE)
+tmp=arrest_tab$sex
+arrest_tab$sex=arrest_tab$race
+arrest_tab$race=tmp
+police_tab=read.csv("Police_Stations.csv", stringsAsFactors=FALSE)
+tmp=gsub("\\)","",gsub("\\(","",arrest_tab$Location))
+tmp=strsplit(tmp,split=",")
+arrest_tab$lon=as.numeric(sapply(tmp,function(x) x[2]))
+arrest_tab$lat=as.numeric(sapply(tmp,function(x) x[1]))
+tmp=gsub("\\)","",gsub("\\(","",police_tab$Location))
+tmp=strsplit(tmp,split=",")
+police_tab$lon=as.numeric(sapply(tmp,function(x) x[2])) 
+police_tab$lat=as.numeric(sapply(tmp,function(x) x[1])) 
+plt=ggplot()
+plt=plt+geom_point(data=arrest_tab[arrest_tab$race=='B',],aes(x=lon,y=lat),color="black",alpha=.1)
+plt=plt+geom_point(data=arrest_tab[arrest_tab$race=='W',],aes(x=lon,y=lat),color="white",alpha=.1)
+plt=plt+geom_point(data=police_tab,aes(x=lon,y=lat),color="red")
+print(plt)
+```
+
+What did you observe? I was surprised to find that most of the arrests made some distance away from the cluster of police stations were for white people. It would be interesting to investigate what kinds of crimes might have been committed so far away from the stations, and why white people stand out as being arrested at that distance, especially in the east.
+
