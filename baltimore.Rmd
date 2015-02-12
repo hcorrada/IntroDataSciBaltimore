@@ -261,8 +261,7 @@ arrest_tab = arrest_tab_original
 What did you observe? The results were interesting. We see a large increase in charges of  narcotics, which may be due to camera surveillance. We also see a decrease in assault, which may be due to the perpetrators of such crimes realizing the dangers of committing such crimes in front of a camera. However, the vast majority of crimes do not even see a 1% change between the two situations, so it would appear as though, overall, cameras do not have a major affect on criminal activity.
 
 <<<<<<< HEAD
-#### Your name(s) here
-Anna Petrone
+#### Anna Petrone
 
 What question are you asking?:
 Which neighborhoods in Baltimore have the higest number of arrests?
@@ -271,7 +270,6 @@ What is the code you use to answer it?:
 
 Load libraries
 ```{r Anna Petrone: libs}
-setwd("C:/Users/annampetrone/Google Drive/UMD/classes/CMSC498T - Data Science II/arrests example")
 
 library(rgdal) # needed for reading shape files
 library(plyr) # needed for rename function
@@ -344,7 +342,7 @@ for (j in 1:ncsa) { # takes about 30 sec
 arrest_tab_geo = cbind(arrest_tab_geo, arrest_nbhd_id)
 ```
 
-For each neighborhood, count the number of arrests, using the tabel function
+For each neighborhood, count the number of arrests, using the table function
 ```{r Anna Petrone: narrests} 
 nbhd.narrests = as.data.frame(table(arrest_nbhd_id))
 nbhd.narrests = rename(nbhd.narrests, c("arrest_nbhd_id"="id", "Freq"="narrests"))
