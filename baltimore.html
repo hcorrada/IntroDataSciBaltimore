@@ -434,6 +434,45 @@ subset(crime_tab, select=c(&quot;pctchange&quot;))</code></pre>
 arrest_tab = arrest_tab_original</code></pre>
 <p>What did you observe? The results were interesting. We see a large increase in charges of narcotics, which may be due to camera surveillance. We also see a decrease in assault, which may be due to the perpetrators of such crimes realizing the dangers of committing such crimes in front of a camera. However, the vast majority of crimes do not even see a 1% change between the two situations, so it would appear as though, overall, cameras do not have a major affect on criminal activity.</p>
 </div>
+<div id="raul-alfaro" class="section level4">
+<h4>Raul Alfaro</h4>
+<p>What question are you asking?: Which is the most common crime per race?</p>
+<p>What is the code you use to answer it?:</p>
+<pre class="r"><code>head(sort(table(arrest_tab$incidentOffense[arrest_tab$race==&quot;A&quot;]),decreasing=TRUE))</code></pre>
+<pre><code>## 
+##         Unknown Offense            87-Narcotics       4E-Common Assault 
+##                      98                      42                      22 
+## 87O-Narcotics (Outside)        24-Towed Vehicle 61-Person Wanted On War 
+##                      13                      10                       6</code></pre>
+<pre class="r"><code>head(sort(table(arrest_tab$incidentOffense[arrest_tab$race==&quot;B&quot;]),decreasing=TRUE))</code></pre>
+<pre><code>## 
+##         Unknown Offense            87-Narcotics 87O-Narcotics (Outside) 
+##                   31500                   21783                    5706 
+##       4E-Common Assault     97-Search &amp; Seizure                79-Other 
+##                    5500                    3255                    2879</code></pre>
+<pre class="r"><code>head(sort(table(arrest_tab$incidentOffense[arrest_tab$race==&quot;H&quot;]),decreasing=TRUE))</code></pre>
+<pre><code>## 87-Narcotics 
+##            1</code></pre>
+<pre class="r"><code>head(sort(table(arrest_tab$incidentOffense[arrest_tab$race==&quot;I&quot;]),decreasing=TRUE))</code></pre>
+<pre><code>## 
+##      Unknown Offense         87-Narcotics    4E-Common Assault 
+##                   92                   44                   14 
+##  97-Search &amp; Seizure     24-Towed Vehicle 4C-Agg. Asslt.- Oth. 
+##                    8                    6                    5</code></pre>
+<pre class="r"><code>head(sort(table(arrest_tab$incidentOffense[arrest_tab$race==&quot;U&quot;]),decreasing=TRUE))</code></pre>
+<pre><code>## 
+##         Unknown Offense       4E-Common Assault            87-Narcotics 
+##                     893                     179                     171 
+## 87O-Narcotics (Outside)     4B-Agg. Asslt.- Cut                79-Other 
+##                      51                      48                      46</code></pre>
+<pre class="r"><code>head(sort(table(arrest_tab$incidentOffense[arrest_tab$race==&quot;W&quot;]),decreasing=TRUE))</code></pre>
+<pre><code>## 
+##         Unknown Offense            87-Narcotics       4E-Common Assault 
+##                    6065                    2702                    1024 
+## 87O-Narcotics (Outside)        55A-Prostitution                79-Other 
+##                     740                     671                     528</code></pre>
+<p>What did you observe? I observed asside from the Unknown Offenses the most common crime for all races but 1 was Narcotics, the “race” had common Assault as their most common crime.</p>
+</div>
 </div>
 </div>
 

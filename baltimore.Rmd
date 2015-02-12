@@ -269,7 +269,6 @@ What question are you asking?: Which is the most common crime per race?
 What is the code you use to answer it?:
 
 ```{r Raul Alfaro}
-plot(1:10,1:10)
 head(sort(table(arrest_tab$incidentOffense[arrest_tab$race=="A"]),decreasing=TRUE))
 head(sort(table(arrest_tab$incidentOffense[arrest_tab$race=="B"]),decreasing=TRUE))
 head(sort(table(arrest_tab$incidentOffense[arrest_tab$race=="H"]),decreasing=TRUE))
