@@ -297,3 +297,28 @@ head(sort(table(a$year), decreasing=TRUE),10)
 
 What did you observe? 
   2011 had the largest number of arrests but there was no dramatic difference between the number of arrests for each year.  There were 52,868 arrests in 2011 which was 1208 more than the number of arrests for 2012.  
+
+
+#### Rentao Wu
+
+What are you asking:
+
+I wanted to know if the ratio of female to male crime rates are similar accross the difference races.
+
+What is the code you used to answer it?
+
+```{r}
+mytab = table(race=arrest_tab$race, sex=arrest_tab$sex)
+#mydf$V1 = NULL
+mydf = as.data.frame.matrix(mytab) 
+mydf$ratio = mydf$F/mydf$M
+mydf$ratio <- round(mydf$ratio, 3)
+mydf = mydf[-1,]
+mydf
+mydf$race <- c("A","B","H","I","U","W")
+
+ggplot(data=mydf, aes(x=race, y=ratio, fill=race)) + geom_bar(stat="identity")
+```
+
+What are your observations?
+I found out that for most race, the ratio of female to male crime rates is about 0.2. This tells us that there are about 1 female for ever 5 male criminal offenses. I also saw that the female to male crime ratio for the white population is about 0.43 which is much higher than the others. 
