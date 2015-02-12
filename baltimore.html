@@ -215,7 +215,7 @@ print(plt)</code></pre>
 </div>
 <div id="a-challenge" class="section level3">
 <h3>A challenge</h3>
-<p>Is there any relationship between the number of CCTV cameras and the number of arrests? Divide the city into a grid and plot the number of CCTV cameras vs. the number of arrests.</p>
+<p>Is there any relationship between the number of CCTV cameras and the number of arrests? Divide the city into a grid and plot the number of CCTV cameras vs. the number of arrests.</p>
 <pre class="r"><code># step 1: divide city intro grid for arrest data
 # step 1a: find the range of latitude and longitude
 latRange=range(arrest_tab$lat,na.rm=TRUE)
@@ -434,6 +434,17 @@ subset(crime_tab, select=c(&quot;pctchange&quot;))</code></pre>
 arrest_tab = arrest_tab_original</code></pre>
 <p>What did you observe? The results were interesting. We see a large increase in charges of narcotics, which may be due to camera surveillance. We also see a decrease in assault, which may be due to the perpetrators of such crimes realizing the dangers of committing such crimes in front of a camera. However, the vast majority of crimes do not even see a 1% change between the two situations, so it would appear as though, overall, cameras do not have a major affect on criminal activity.</p>
 </div>
+<div id="kim-st.andrie-rattanawaleerain-surasorn" class="section level4">
+<h4>Kim St. Andrie, Rattanawalee(Rain) Surasorn</h4>
+<p>What question are you asking?: Which year had the largest number of arrests?</p>
+<p>What is the code you use to answer it?:</p>
+<pre class="r"><code>a &lt;- data.frame(id = arrest_tab$arrest, year = substr(arrest_tab$arrestDate,7,11))
+sort(table(a$year), decreasing=TRUE)</code></pre>
+<pre><code>## 
+##  2011  2012 
+## 52868 51660</code></pre>
+<p>What did you observe? 2011 had the largest number of arrests but there was no dramatic difference between the number of arrests for each year. There were 52,868 arrests in 2011 which was 1208 more than the number of arrests for 2012.</p>
+</div>
 </div>
 </div>
 
@@ -461,3 +472,4 @@ $(document).ready(function () {
 
 </body>
 </html>
+

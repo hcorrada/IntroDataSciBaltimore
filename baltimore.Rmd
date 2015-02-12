@@ -260,3 +260,21 @@ arrest_tab = arrest_tab_original
 
 What did you observe? The results were interesting. We see a large increase in charges of  narcotics, which may be due to camera surveillance. We also see a decrease in assault, which may be due to the perpetrators of such crimes realizing the dangers of committing such crimes in front of a camera. However, the vast majority of crimes do not even see a 1% change between the two situations, so it would appear as though, overall, cameras do not have a major affect on criminal activity.
 
+
+
+
+#### Kim St. Andrie, Rain Surasorn
+
+What question are you asking?:
+  Which year had the largest number of arrests?
+
+What is the code you use to answer it?:
+
+```{r KimRain}
+a <- data.frame(id = arrest_tab$arrest, year = substr(arrest_tab$arrestDate,7,11))
+head(sort(table(a$year), decreasing=TRUE),1)
+
+```
+
+What did you observe? 
+  2011 had the largest number of arrests but there was no dramatic difference between the number of arrests for each year.  There were 52,868 arrests in 2011 which was 1208 more than the number of arrests for 2012.  
