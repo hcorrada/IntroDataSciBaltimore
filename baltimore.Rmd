@@ -472,3 +472,20 @@ kpai()
 
 What did you observe? I was surprised to find that most of the arrests made some distance away from the cluster of police stations were for white people. It would be interesting to investigate what kinds of crimes might have been committed so far away from the stations, and why white people stand out as being arrested at that distance, especially in the east.
 
+#### Zach Jiroun, Jose Zamora, Des Chandhok
+
+What question are you asking?:
+
+Were more males or females arrested on Valentine's Day, and for which crimes?
+
+```{r}
+
+vday = function() {
+  vdaytab <- table(arrest_tab$arrestDate == "02/14/2011", arrest_tab$sex)
+  mytab = as.data.frame.matrix(vdaytab)
+  mytab$ratio = mytab$F/mytab$M
+  mytab$ratio <- round(mytab$ratio, 3)
+  mytab
+}
+vday()
+```
