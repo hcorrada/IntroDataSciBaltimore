@@ -472,3 +472,85 @@ kpai()
 
 What did you observe? I was surprised to find that most of the arrests made some distance away from the cluster of police stations were for white people. It would be interesting to investigate what kinds of crimes might have been committed so far away from the stations, and why white people stand out as being arrested at that distance, especially in the east.
 
+
+
+###Klar Kuo
+
+What are you asking?
+
+What types of crimes have increased and decreased in frequency?
+
+What is the code you use to answer it?
+
+```{r cheesepuff18}
+
+library(ggplot2)
+library(stringr)
+require(data.table)
+
+# Filter the list so that it only includes types of offenses that have happened over 500 times
+# (So that it has enough data to be meaningful)
+arrest_type <- table(arrest_tab$incidentOffense)
+arrest_type[arrest_type >= 500]
+
+arrest_type_list <- names(arrest_type[arrest_type >= 500])
+arrest_type_list
+
+# All the arrests for those types that we singled out
+arrest_dates <- arrest_tab[arrest_tab$incidentOffense %in% arrest_type_list ,]
+# Set all the counts to one so we can sum them when we aggregate
+arrest_table <- data.table(arrest_dates)
+arrest_table <- arrest_table[, count := 1, by=arrestDate]
+
+# Aggregate all the data together by how many times a type of incident occured on each day
+arrest_table <- setNames(aggregate(arrest_table$count, list(arrest_table$incidentOffense, arrest_table$arrestDate), sum), c("incidentOffense","arrestDate","count"))
+
+# Graph it
+ggplot(data=arrest_table, aes(x=arrestDate, y=count, group=incidentOffense, colour=incidentOffense)) +
+       geom_line() +
+       geom_point()
+
+# The last graph has too many data points crammed in, so we aggregate the data by month and graph it again
+# Set a shortdate column with a simple month and year so the system can aggregate them on it
+arrest_table$shortdate <- strftime(as.Date(arrest_table$arrestDate, "%m/%d/%Y"), format="%y/%m")
+arrest_table <- setNames(aggregate(arrest_table$count, list(arrest_table$incidentOffense, arrest_table$shortdate), sum), c("incidentOffense","arrestMonth","count"))
+
+ggplot(data=arrest_table, aes(x=arrestMonth, y=count, group=incidentOffense, colour=incidentOffense)) +
+       geom_line() +
+       geom_point()
+
+# Lets take a look at the graph without the highest two types of occurences, because those two are so much higher
+low_arrests <- arrest_table[arrest_table$incidentOffense!="87-Narcotics",]
+low_arrests <- low_arrests[low_arrests$incidentOffense!="Unknown Offense",]
+
+ggplot(data=low_arrests, aes(x=arrestMonth, y=count, group=incidentOffense, colour=incidentOffense)) +
+       geom_line() +
+       geom_point()
+
+# Take a closer look at the graph from the most common type of occurence that's now "Unknown"
+# (87-Narcotics)
+high_arrests <- arrest_table[arrest_table$incidentOffense=="87-Narcotics",]
+high_arrests
+
+ggplot(data=high_arrests, aes(x=arrestMonth, y=count, group=incidentOffense, colour=incidentOffense)) +
+       geom_line() +
+       geom_point()
+
+# Now lets split this into two lines, one for each year
+high_arrests$year <- str_split_fixed(high_arrests$arrestMonth, "/", 2)[,1]
+high_arrests$month <- str_split_fixed(high_arrests$arrestMonth, "/", 2)[,2]
+
+ggplot(data=high_arrests, aes(x=month, y=count, group=year, colour=year)) +
+       geom_line() +
+       geom_point()
+
+```
+
+What did you observe?
+
+Between the beginning of 2011 and the end of 2012, crime rates fluctuated quite a bit, but seemed to end up at around the same level. To be more specific, the crime rates for the most popular types of crimes all seemed to increase in frequency between the two dates, but then drop back to around what it started at.
+
+After looking at graphs for each year specifically, it looks like crime rises towards the middle of the year and then dies down towards winter. This could be due to the weather or perhaps the holiday scheduling of the police (or of criminal activity).
+
+However, it does look like the rate of crime for this time period increased right in the middle. In the year-separated-graph for Narcotics, the end of 2011 had clearly higher levels than the start of 2011, and the start of 2012 was higher than the end of 2012. This could be attributed to lower levels of employment in that time
+
