@@ -472,3 +472,24 @@ kpai()
 
 What did you observe? I was surprised to find that most of the arrests made some distance away from the cluster of police stations were for white people. It would be interesting to investigate what kinds of crimes might have been committed so far away from the stations, and why white people stand out as being arrested at that distance, especially in the east.
 
+#### David Kaminsky
+
+
+What question are you asking?: What is frequency of an offense during each hour of the day?
+
+What is the code you use to answer it?:
+
+```{r DavidKaminsky}
+results=table(substr(arrest_tab$arrestTime, 0, 2),gsub("-.*$", "", arrest_tab$incidentOffense))
+
+# Then, to see the distribution for a specific hour, replace HOUR with a number 1-24:
+
+barplot(head(results,HOUR), las=2)
+
+```
+
+What did you observe?
+I observed that unknown crime is most common, followed by narcotics and assult.
+
+
+
