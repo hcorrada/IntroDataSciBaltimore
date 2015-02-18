@@ -472,3 +472,19 @@ kpai()
 
 What did you observe? I was surprised to find that most of the arrests made some distance away from the cluster of police stations were for white people. It would be interesting to investigate what kinds of crimes might have been committed so far away from the stations, and why white people stand out as being arrested at that distance, especially in the east.
 
+#### Nicholas Mosquera
+
+What question are you asking?: How do the number of arrests change from 4th of July to Christmas for 2011 and 2012?
+
+What is the code you use to answer it?:
+
+```{r Nicholas}
+a <- table(arrest_tab$arrest[arrest_tab$arrestDate=="07/04/2011"])
+b <- table(arrest_tab$arrest[arrest_tab$arrestDate=="12/25/2011"])
+c <- table(arrest_tab$arrest[arrest_tab$arrestDate=="07/04/2012"])
+d <- table(arrest_tab$arrest[arrest_tab$arrestDate=="12/25/2012"])
+num_of_arrests <- c(length(a),length(b),length(c),length(d))
+barplot(num_of_arrests, main="Number of Arrests for 4th of July and Christmas", names.arg=c("07/04/2011","12/25/2011","07/04/2012","12/25/2012"))
+```
+
+What did you observe?: There are actually mixed results. For the 4th of July, there were more arrests in 2012(132) than in 2011(113). For Christmas, there were more arrests in 2011(53) than in 2012(43). There are many more arrests on the 4th of July for both years.
