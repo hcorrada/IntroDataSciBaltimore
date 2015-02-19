@@ -472,3 +472,28 @@ kpai()
 
 What did you observe? I was surprised to find that most of the arrests made some distance away from the cluster of police stations were for white people. It would be interesting to investigate what kinds of crimes might have been committed so far away from the stations, and why white people stand out as being arrested at that distance, especially in the east.
 
+
+#### Cynthia Gan
+
+What question are you asking?:
+
+I am asking if there are differences in the distribution of arrests throughout the day depending on the age of the arrestee.
+
+What is the code you use to answer it?:
+
+```{r CynthiaGan}
+
+#Bin the arrest data into age and time period chunks
+ageGrid = seq(0,90,10)
+ageFactor=cut(arrest_tab$age, breaks=ageGrid)
+hourGrid = seq(0, 24, 3)
+hourFactor=cut(arrest_tab$hours, breaks=hourGrid)
+#Create a mosaic plot
+mosaicplot(table(ageFactor, hourFactor), color=colorRampPalette(c('dark cyan','white','dark goldenrod'))(8), main="Number of Arrests by Age and Time of Day", xlab ="Age", ylab = "Time")
+
+
+```
+
+What did you observe?
+
+The distribution of arrest times across age groups is actually quite similar. However, there is a trend where the young and the elderly are less likely to be arrested during beginnnings and ends of the day. Also, people 20 years old and younger are active in the afternoon and evening rather than the morning. The drop in activity in the hours of 3am-6am observed by Mihai is shared by all age groups.  
