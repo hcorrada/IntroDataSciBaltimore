@@ -472,3 +472,29 @@ kpai()
 
 What did you observe? I was surprised to find that most of the arrests made some distance away from the cluster of police stations were for white people. It would be interesting to investigate what kinds of crimes might have been committed so far away from the stations, and why white people stand out as being arrested at that distance, especially in the east.
 
+#### Ian Persons
+
+What question are you asking?: What day of the week has the most crime?
+
+What is the code you use to answer it?:
+
+```{r ipersons}
+library(ggplot2)
+ipersons=function()
+  {
+    arrest_tab = read.csv(file="BPD_Arrests.csv", head=TRUE)
+    date <- strptime(arrest_tab$arrestDate, "%m/%d/%Y")
+    arrest_tab$dow <- as.numeric(format(date, "%w"))
+    
+    dow_df <- as.data.frame(table(arrest_tab$dow))
+    names(dow_df) <- c("Day", "Count")
+    
+    g <- ggplot(data=dow_df, aes(x=Day,y=Count, fill=Day)) + geom_bar(stat="identity")
+    g <- g + labs(title = "Arrests During the Week", x="Day of the Week",y="Number of Arrests")
+    g
+  }
+ipersons()
+```
+
+What did you observe? 
+I observed that arrests peak in the middle of the week, with the weekend having the least arrests. It would be interesting to study the types of crimes committed throughout the week to see if all crimes follow this pattern or not.
