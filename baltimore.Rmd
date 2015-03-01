@@ -472,3 +472,71 @@ kpai()
 
 What did you observe? I was surprised to find that most of the arrests made some distance away from the cluster of police stations were for white people. It would be interesting to investigate what kinds of crimes might have been committed so far away from the stations, and why white people stand out as being arrested at that distance, especially in the east.
 
+#### Alyster Alcudia
+
+What question are you asking?: 
+
+How close to elementary schools do arrests for violent crimes occur?
+
+What is the code you use to answer it?:
+
+Let's load the school location data at https://data.baltimorecity.gov/Geographic/Baltimore-City-Public-School-System-Elementary-Sch/6jcd-xgn7.
+
+```{r aalcudia:loaddata}
+school_tab=read.csv("bcpss_es_boundary.csv", stringsAsFactors=FALSE)
+```
+
+Now let's filter the arrest data to keep only violent crimes, based on the filter from https://data.baltimorecity.gov/Public-Safety/Violent-Crime/s97b-tych.
+
+```{r aalcudia:filter}
+library(dplyr)
+
+violent_str<-"Murder|Rape|Assault|Robbery"
+
+# look through incidentOffense and chargeDescription
+violent_tab<-
+  filter(arrest_tab, 
+  (grepl(violent_str, incidentOffense) | 
+  grepl(violent_str, chargeDescription)))
+
+```
+
+We still need to extract longitude and latitude from violent_tab's Location
+
+```{r aalcudia:lonlat}
+tmp=gsub("\\)","",gsub("\\(","",violent_tab$Location))
+tmp=strsplit(tmp,split=",")
+violent_tab$lon=as.numeric(sapply(tmp,function(x) x[2]))
+violent_tab$lat=as.numeric(sapply(tmp,function(x) x[1]))
+
+tmp=gsub("\\)","",gsub("\\(","",arrest_tab$Location))
+tmp=strsplit(tmp,split=",")
+arrest_tab$lon=as.numeric(sapply(tmp,function(x) x[2]))
+arrest_tab$lat=as.numeric(sapply(tmp,function(x) x[1]))
+```
+
+We can now plot locations of violent crimes arrests in Baltimore with elementary schools.
+
+```{r aalcudia:plot}
+library(maps)
+library(ggplot2)
+
+balto_map = subset(map_data("county", region="maryland"),subregion=="baltimore city")
+
+plt=ggplot()
+
+# plot shape of Baltimore City
+plt=plt+geom_polygon(data=balto_map,aes(x=long,y=lat),color="white",fill="gray40")
+
+# plot violent crimes arrests in red
+#plt=plt+geom_point(data=arrest_tab,aes(x=lon,y=lat),color="blue",alpha=.1)
+plt=plt+geom_point(data=violent_tab,aes(x=lon,y=lat),color="red",alpha=.1)
+
+# plot elementary schools in blue
+plt=plt+geom_point(data=school_tab,aes(x=x,y=y),color="blue")
+
+print(plt)
+```
+
+What did you observe?: 
+
