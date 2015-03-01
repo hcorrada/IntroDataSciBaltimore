@@ -476,11 +476,17 @@ What did you observe? I was surprised to find that most of the arrests made some
 
 What question are you asking?: 
 
-How close to elementary schools do arrests for violent crimes occur?
+According to a 2009 study by the Department of Justice, children exposed to violence are more likely to abuse drugs and alcohol; suffer from depression, anxiety, and post-traumatic disorders; fail or have difficulty in school; and become delinquent and engage in criminal behavior.*
+
+Considering how many youths are admitted into the Baltimore Juvenile Justice Center per year, I will be asking the following:
+
+How close to public elementary schools do arrests for violent crimes occur?
+
+*Finkelhor, D., Turner, H., Ormrod, R., Hamby, S., and Kracke, K. 2009. Children’s Exposure to Violence: A Comprehensive National Survey. Bulletin. Washington, DC: U.S. Department of Justice, Office of Justice Programs, Office of Juvenile Justice and Delinquency Prevention.
 
 What is the code you use to answer it?:
 
-Let's load the school location data at https://data.baltimorecity.gov/Geographic/Baltimore-City-Public-School-System-Elementary-Sch/6jcd-xgn7.
+Let's load the school location data from https://data.baltimorecity.gov/Geographic/Baltimore-City-Public-School-System-Elementary-Sch/6jcd-xgn7.
 
 ```{r aalcudia:loaddata}
 school_tab=read.csv("bcpss_es_boundary.csv", stringsAsFactors=FALSE)
@@ -501,7 +507,7 @@ violent_tab<-
 
 ```
 
-We still need to extract longitude and latitude from violent_tab's Location
+We still need to extract longitude and latitude from violent_tab's Location.
 
 ```{r aalcudia:lonlat}
 tmp=gsub("\\)","",gsub("\\(","",violent_tab$Location))
@@ -534,3 +540,6 @@ print(plt)
 
 What did you observe?: 
 
+Most schools are not too far from the locations of violent crimes arrests, the notable exceptions being the four schools in North Baltimore. The schools toward the middle of the city are more exposed to violent crimes arrests. These results are largely unsurprising, however, since both the locations of public elementary schools and violent crimes arrests might be more closely related to population density.
+
+Deeper analyses would have to be made to correlate exposure to violent crimes and school-to-prison pipelines.
