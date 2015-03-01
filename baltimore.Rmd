@@ -508,11 +508,6 @@ tmp=gsub("\\)","",gsub("\\(","",violent_tab$Location))
 tmp=strsplit(tmp,split=",")
 violent_tab$lon=as.numeric(sapply(tmp,function(x) x[2]))
 violent_tab$lat=as.numeric(sapply(tmp,function(x) x[1]))
-
-tmp=gsub("\\)","",gsub("\\(","",arrest_tab$Location))
-tmp=strsplit(tmp,split=",")
-arrest_tab$lon=as.numeric(sapply(tmp,function(x) x[2]))
-arrest_tab$lat=as.numeric(sapply(tmp,function(x) x[1]))
 ```
 
 We can now plot locations of violent crimes arrests in Baltimore with elementary schools.
@@ -529,7 +524,6 @@ plt=ggplot()
 plt=plt+geom_polygon(data=balto_map,aes(x=long,y=lat),color="white",fill="gray40")
 
 # plot violent crimes arrests in red
-#plt=plt+geom_point(data=arrest_tab,aes(x=lon,y=lat),color="blue",alpha=.1)
 plt=plt+geom_point(data=violent_tab,aes(x=lon,y=lat),color="red",alpha=.1)
 
 # plot elementary schools in blue
