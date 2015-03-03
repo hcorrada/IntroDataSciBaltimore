@@ -486,9 +486,7 @@ arrest_tab$date <- as.POSIXlt(strptime(arrest_tab$arrestDate, "%m/%d/%Y"))
 
 arrest_tab$monthDay <- as.POSIXlt(strptime(format(arrest_tab$date, format="%m-%d"), "%m-%d"))
 
-hist(arrest_tab$monthDay, breaks=365, xlab="Day of the Year", ylab="Number of Arrests", 
-
-main="Arrest Frequency Over A Year")
+hist(arrest_tab$monthDay, breaks=365, xlab="Day of the Year", ylab="Number of Arrests", main="Arrest Frequency Over A Year")
 ```
 
 What did you observe?
