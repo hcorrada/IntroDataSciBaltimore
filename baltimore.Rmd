@@ -478,6 +478,7 @@ What did you observe? I was surprised to find that most of the arrests made some
 #### Richard Rice
 
 What question are you asking?:
+
 What time of the year has the most and least amount of arrests?
 
 What is the code you use to answer it?:
@@ -490,4 +491,5 @@ hist(arrest_tab$monthDay, breaks=365, xlab="Day of the Year", ylab="Number of Ar
 ```
 
 What did you observe?
+
 I found that the number of arrests seems to peak around early May and late September, with less around early July, late February, and around Christmas and New Years.
