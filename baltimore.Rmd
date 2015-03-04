@@ -872,3 +872,4 @@ What did you observe?:
 Most schools are not too far from the locations of violent crimes arrests, the notable exceptions being the four schools in North Baltimore. The schools toward the middle of the city are more exposed to violent crimes arrests. These results are largely unsurprising, however, since both the locations of public elementary schools and violent crimes arrests might be more closely related to population density.
 
 Deeper analyses would have to be made to correlate exposure to violent crimes and school-to-prison pipelines.
+
