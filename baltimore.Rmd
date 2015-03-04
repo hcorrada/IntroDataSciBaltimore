@@ -536,3 +536,33 @@ Note: because there were no dates associated with when buildings became vacant
 January 2015 to minimize the number of "extra" vacant buildings. We assume that
 there was not a significant number of new vacant buildings added since the month
 of January.
+#### Zach Jiroun, Jose Zamora, Des Chandhok
+
+What question are you asking?:
+
+What is the female to male ratio of different types of crimes on Valentine's Day, 2011?
+
+```{r}
+
+library(plyr)
+vdaytab <- table(incident=arrest_tab$incidentOffense,sex=arrest_tab$sex,date=arrest_tab$arrestDate=="02/14/2011")
+vdaytab <- vdaytab[,,-1]
+vdaydf = as.data.frame.matrix(vdaytab)
+vdaydf$ratio = vdaydf$F/vdaydf$M
+vdaydf$ratio <- round(vdaydf$ratio, 3)
+vdaydf <- subset(vdaydf, M > 0 | F > 0)
+vdaydf[-1]
+vdaydf$offense <- c("111", "112", "115", "23", "24", "26", "3K", "3P", "4B", "4C", "4E", "54", "5D", "6C", "79", "7A", "87", "87O", "97", "Unknown")
+vdaydf$offense_description <- c("(111) Protective Order", "(112) Traffic Related Incident", "(115) Trespassing", "(23) Unauthorized Use", "(24) Towed Vehicle", "(26) Recovered Vehicle", "(3K) Robb Res. (Ua)", "(3P) Robb Misc. (Ua)", "(4B) Agg. Asslt.- Cut", "(4C) Agg. Asslt.- Oth.", "(4E) Common Assault", "(54) Armed Person", "(5D) Burg. Oth. (Force)", "(6C) Larceny- Shoplifting", "(79) Other", "(7A) Stolen Auto", "(87) Narcotics", "(87O)Narcotics (Outside)", "(97) Search & Seizure", "Unknown Offense")
+ggplot(data=vdaydf, aes(x=offense, y=ratio, fill=offense_description)) + geom_bar(stat="identity") + ggtitle("Valentine's Day 2011 F/M Crime Ratio") + theme(axis.text.x = element_text(angle=90))
+
+# Removing 0 and Inf ratios
+v <- subset(vdaydf, ratio > 0 & ratio < Inf)
+v[-1]
+v$offense <- c("4B", "4E", "79", "87O", "97", "Unknown")
+v$offense_description <- c("Agg. Asslt.- Cut", "Common Assault", "Other", "Narcotics (Outside)", "Search & Seizure", "Unknown Offense")
+ggplot(data=v, aes(x=offense, y=ratio, fill=offense_description)) + geom_bar(stat="identity") + ggtitle("Valentine's Day 2011 F/M Crime Ratio")
+
+```
+
+What did you observe? We were surprised to find that there were significantly more Male arrests than Female arrests. In the categories where Males and Females were arrested for the same crime, only about 1/4 of them were Female. We also thought it was interesting that there was only 1 Female Narcotics related arrest. Whether or not 17 Narcotics related Male arrests were related to Valentine's Day remains to be seen.
