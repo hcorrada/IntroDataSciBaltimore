@@ -801,3 +801,75 @@ What did you observe?:
 While we suspected that crime count would correlate with temperature, we found that the correlation coefficient was only 0.3673, suggesting that crime is not influenced linearly by the temperature. There also seems to be no clear non-linear dependence of crime on temperature for our data. Compared to this (http://crime.static-eric.com/) analysis of Chicago, temperature appears to relate to crime in Baltimore to a much smaller degree.
 
 
+#### Alyster Alcudia
+
+What question are you asking?: 
+
+According to a 2009 study by the Department of Justice, children exposed to violence are more likely to abuse drugs and alcohol; suffer from depression, anxiety, and post-traumatic disorders; fail or have difficulty in school; and become delinquent and engage in criminal behavior.*
+
+Considering how many youths are admitted into the Baltimore Juvenile Justice Center per year, I will be asking the following:
+
+How close to public elementary schools do arrests for violent crimes occur?
+
+*Finkelhor, D., Turner, H., Ormrod, R., Hamby, S., and Kracke, K. 2009. Children’s Exposure to Violence: A Comprehensive National Survey. Bulletin. Washington, DC: U.S. Department of Justice, Office of Justice Programs, Office of Juvenile Justice and Delinquency Prevention.
+
+What is the code you use to answer it?:
+
+Let's load the school location data from https://data.baltimorecity.gov/Geographic/Baltimore-City-Public-School-System-Elementary-Sch/6jcd-xgn7.
+
+```{r aalcudia:loaddata}
+school_tab=read.csv("bcpss_es_boundary.csv", stringsAsFactors=FALSE)
+```
+
+Now let's filter the arrest data to keep only violent crimes, based on the filter from https://data.baltimorecity.gov/Public-Safety/Violent-Crime/s97b-tych.
+
+```{r aalcudia:filter}
+library(dplyr)
+
+violent_str<-"Murder|Rape|Assault|Robbery"
+
+# look through incidentOffense and chargeDescription
+violent_tab<-
+  filter(arrest_tab, 
+  (grepl(violent_str, incidentOffense) | 
+  grepl(violent_str, chargeDescription)))
+
+```
+
+We still need to extract longitude and latitude from violent_tab's Location.
+
+```{r aalcudia:lonlat}
+tmp=gsub("\\)","",gsub("\\(","",violent_tab$Location))
+tmp=strsplit(tmp,split=",")
+violent_tab$lon=as.numeric(sapply(tmp,function(x) x[2]))
+violent_tab$lat=as.numeric(sapply(tmp,function(x) x[1]))
+```
+
+We can now plot locations of violent crimes arrests in Baltimore with elementary schools.
+
+```{r aalcudia:plot}
+library(maps)
+library(ggplot2)
+
+balto_map = subset(map_data("county", region="maryland"),subregion=="baltimore city")
+
+plt=ggplot()
+
+# plot shape of Baltimore City
+plt=plt+geom_polygon(data=balto_map,aes(x=long,y=lat),color="white",fill="gray40")
+
+# plot violent crimes arrests in red
+plt=plt+geom_point(data=violent_tab,aes(x=lon,y=lat),color="red",alpha=.1)
+
+# plot elementary schools in blue
+plt=plt+geom_point(data=school_tab,aes(x=x,y=y),color="blue")
+
+print(plt)
+```
+
+What did you observe?: 
+
+Most schools are not too far from the locations of violent crimes arrests, the notable exceptions being the four schools in North Baltimore. The schools toward the middle of the city are more exposed to violent crimes arrests. These results are largely unsurprising, however, since both the locations of public elementary schools and violent crimes arrests might be more closely related to population density.
+
+Deeper analyses would have to be made to correlate exposure to violent crimes and school-to-prison pipelines.
+
