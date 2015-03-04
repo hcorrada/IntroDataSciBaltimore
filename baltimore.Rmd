@@ -668,7 +668,9 @@ Do people commit fewer crimes during the holidays?
 ```
 
 #####What did you observe? 
-Looking at the heat map for 2011 and 2012, there is a very distinct reduction in number of arrests on Thanksgiving (the fourth Thursday of November). Moreover, on Christmas (the last Sunday of December in 2011 and the last Tuesday of December in 2012) and the days leading up to Christmas, we observe green squares as well. It's hard to tell whether this reduction in arrests is due to fewer officers working on the holidays or due to fewer crimes being committed. In making this judgement, it would be useful to have data on the number of officers working each day.#### Nicholas Mosquera
+Looking at the heat map for 2011 and 2012, there is a very distinct reduction in number of arrests on Thanksgiving (the fourth Thursday of November). Moreover, on Christmas (the last Sunday of December in 2011 and the last Tuesday of December in 2012) and the days leading up to Christmas, we observe green squares as well. It's hard to tell whether this reduction in arrests is due to fewer officers working on the holidays or due to fewer crimes being committed. In making this judgement, it would be useful to have data on the number of officers working each day.
+
+#### Nicholas Mosquera
 
 What question are you asking?: How do the number of arrests change from 4th of July to Christmas for 2011 and 2012?
 
@@ -684,3 +686,4 @@ barplot(num_of_arrests, main="Number of Arrests for 4th of July and Christmas", 
 ```
 
 What did you observe?: There are actually mixed results. For the 4th of July, there were more arrests in 2012(132) than in 2011(113). For Christmas, there were more arrests in 2011(53) than in 2012(43). There are many more arrests on the 4th of July for both years.
+
