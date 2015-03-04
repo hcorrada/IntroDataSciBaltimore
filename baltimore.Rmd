@@ -922,3 +922,80 @@ hist(arrest_tab$monthDay, breaks=365, xlab="Day of the Year", ylab="Number of Ar
 What did you observe?
 
 I found that the number of arrests seems to peak around early May and late September, with less around early July, late February, and around Christmas and New Years.
+
+#### Max Burns
+
+What question are you asking?:
+
+I am trying to answer: Do age and gender have an impact on what time an arrest of that person is made?  
+
+I plan to separate age into age groups and use that and the gender as different lines in the chart, while arrestTime (grouped into hours) is the x-axis and the number of Narcotics-related arrests as the y-axis.
+
+What is the code you use to answer it?:
+
+```{r burns}
+(function () {
+arrest_tab = read.csv("BPD_Arrests.csv", stringsAsFactors=FALSE)
+tmp=arrest_tab$sex
+arrest_tab$sex=arrest_tab$race
+arrest_tab$race=tmp
+
+library(dplyr)
+library(stringr)
+library(reshape2)
+library(ggplot2)
+
+#data <- filter(arrest_tab, grepl('87O?-Narcotics',incidentOffense ))
+data <- select(arrest_tab,age,sex,arrestTime)
+
+getAgeSexGroup <- function(age, sex){
+	if(age[1] < 18){
+		return(paste("Under18-",sex, sep=""))
+	} else if (age[1] < 26){
+		return(paste("18to25-",sex, sep=""))
+	} else if (age[1] < 41){
+		return(paste("26to40-",sex, sep=""))
+	} else if (age[1] < 56){
+		return(paste("41to55-",sex, sep=""))
+	} else if (age[1] < 71){
+		return(paste("56to70-",sex, sep=""))
+	}else {
+		return(paste("Over70-",sex, sep=""))
+	}
+}
+getHour <- function(arrestTime){
+	return(strtoi(str_match(arrestTime,"([0-9]{2}):[0-9]{2}")[2]))
+}
+
+data <- data %>%
+	rowwise() %>%
+		mutate(demographic = getAgeSexGroup(age,sex), hour=getHour(arrestTime))
+
+#data <- select(data, demographic, hour)
+groupings = group_by(data, demographic, hour)
+summ <- summarise(groupings, count=n())
+
+summ=ungroup(summ)
+m18to25 <- select(filter(summ,demographic=='18to25-M'),-demographic)
+f18to25 <- select(filter(summ,demographic=='18to25-F'),-demographic)
+m26to40 <- select(filter(summ,demographic=='26to40-M'),-demographic)
+f26to40 <- select(filter(summ,demographic=='26to40-F'),-demographic)
+m41to55 <- select(filter(summ,demographic=='41to55-M'),-demographic)
+f41to55 <- select(filter(summ,demographic=='41to55-F'),-demographic)
+
+myResult <- select(m18to25,hour)
+myResult$m18to25 <- m18to25$count
+myResult$f18to25 <- f18to25$count
+myResult$m26to40 <- m26to40$count
+myResult$f26to40 <- f26to40$count
+myResult$m41to55 <- m41to55$count
+myResult$f41to55 <- f41to55$count
+
+df<- melt(myResult, id.vars='hour', variable_name = 'demographic', measure.vars=c("m18to25","f18to25","m26to40","f26to40","m41to55","f41to55"))
+	
+ggplot(data=df, aes(x=hour,y=value)) + geom_line(aes(colour = variable)) +xlab("Hour of Day") + ylab("Count(Logarithmic") + ggtitle("Hour of Day vs Arrest Count by Age Group and Sex") + labs(colour="Demographic") + scale_y_log10()
+})()
+```
+
+What did you observe?
+While the lines for the male demographics were grouped closely together on the logarithmic scale throughout the various hours, the female demographics were much more varied, with the Female 18-25 demographic being the furthest from the clear pattern.  
