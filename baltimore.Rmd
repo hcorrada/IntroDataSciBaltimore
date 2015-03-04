@@ -484,12 +484,16 @@ results=table(substr(arrest_tab$arrestTime, 0, 2),gsub("-.*$", "", arrest_tab$in
 
 # Then, to see the distribution for a specific hour, replace HOUR with a number 1-24:
 
-barplot(head(results,HOUR), las=2)
+barplot(head(results,1), las=2)
+barplot(head(results,6), las=2)
+barplot(head(results,12), las=2)
+barplot(head(results,18), las=2)
+barplot(head(results,24), las=2)
 
 ```
 
 What did you observe?
-I observed that unknown crime is most common, followed by narcotics and assult.
+I observed that unknown crime is most common, followed by narcotics and assult. If you look at the graphs individually, at (military times) 0100, 0600, 1200, 1800, and 2400, you will see that the types of arrests most prominently shown are either unknown, narcotics, or assult. 
 
 
 
