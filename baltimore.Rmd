@@ -755,3 +755,4 @@ mosaicplot(table(ageFactor, hourFactor), color=colorRampPalette(c('dark cyan','w
 What did you observe?
 
 The distribution of arrest times across age groups is actually quite similar. However, there is a trend where the young and the elderly are less likely to be arrested during beginnnings and ends of the day. Also, people 20 years old and younger are active in the afternoon and evening rather than the morning. The drop in activity in the hours of 3am-6am observed by Mihai is shared by all age groups.  
+
