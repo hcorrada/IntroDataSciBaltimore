@@ -756,3 +756,48 @@ What did you observe?
 
 The distribution of arrest times across age groups is actually quite similar. However, there is a trend where the young and the elderly are less likely to be arrested during beginnnings and ends of the day. Also, people 20 years old and younger are active in the afternoon and evening rather than the morning. The drop in activity in the hours of 3am-6am observed by Mihai is shared by all age groups.  
 
+#### Joe Downs, Michael Kleyman, Anumeet Nepaul
+	
+What question are you asking?:
+
+We were curious about how temperature relates to crime. Does crime count
+correlate with temperature? We used average temperature values for Baltimore
+from wunderground and normalized our counts for each temperature by the number
+of days that experienced that temperature. It seems that there should be more
+crimes in warmer weather because both criminals and victims should be more
+likely to spend time outside when it is warmer.
+
+What is the code you use to answer it?:
+
+```{r jdowns_mkleyman_anepaul}
+    # load weather data from csv file
+    baltimore_weather <- read.csv("baltimore_weather.csv", stringsAsFactors=FALSE)
+
+    # store abbrevation of weather data and add formatting for date	
+    tempAbr <- baltimore_weather[,c("EST","Mean.TemperatureF")]
+    tempAbr$EST <- as.Date(baltimore_weather$EST,"%Y-%m-%d")
+
+    # copy arrest data and add formatting for date
+    Date_Arrests <- arrest_tab
+    Date_Arrests$arrestDate <- as.Date(Date_Arrests$arrestDate,"%m/%d/%Y")
+
+    # join weather and crime tables to match days together
+    tempMerge<-merge(x=Date_Arrests,y=tempAbr, by.x ="arrestDate", by.y="EST" )
+    tableCrime <- table(tempMerge$Mean.TemperatureF)
+    tableTemp <- table(baltimore_weather$Mean.TemperatureF)
+
+    # plot crime count versus temperature, normalized by day count for each temperature
+    plot(tableCrime/tableTemp, xlab="Temperature (F)", ylab="Normalized Crime Count")
+    divTable = tableCrime/tableTemp
+    divtmatrix = as.data.frame(divTable)
+    # cast factors as numeric values for correlation
+    divtmatrix[,1] <- as.numeric(as.character(divtmatrix[,1]))
+    divtmatrix[,2] <- as.numeric(divtmatrix[,2])
+    cor(divtmatrix[,1],divtmatrix[,2])
+```
+
+What did you observe?:
+
+While we suspected that crime count would correlate with temperature, we found that the correlation coefficient was only 0.3673, suggesting that crime is not influenced linearly by the temperature. There also seems to be no clear non-linear dependence of crime on temperature for our data. Compared to this (http://crime.static-eric.com/) analysis of Chicago, temperature appears to relate to crime in Baltimore to a much smaller degree.
+
+
