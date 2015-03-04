@@ -668,7 +668,9 @@ Do people commit fewer crimes during the holidays?
 ```
 
 #####What did you observe? 
-Looking at the heat map for 2011 and 2012, there is a very distinct reduction in number of arrests on Thanksgiving (the fourth Thursday of November). Moreover, on Christmas (the last Sunday of December in 2011 and the last Tuesday of December in 2012) and the days leading up to Christmas, we observe green squares as well. It's hard to tell whether this reduction in arrests is due to fewer officers working on the holidays or due to fewer crimes being committed. In making this judgement, it would be useful to have data on the number of officers working each day.#### David Kaminsky
+Looking at the heat map for 2011 and 2012, there is a very distinct reduction in number of arrests on Thanksgiving (the fourth Thursday of November). Moreover, on Christmas (the last Sunday of December in 2011 and the last Tuesday of December in 2012) and the days leading up to Christmas, we observe green squares as well. It's hard to tell whether this reduction in arrests is due to fewer officers working on the holidays or due to fewer crimes being committed. In making this judgement, it would be useful to have data on the number of officers working each day.
+
+#### David Kaminsky
 
 
 What question are you asking?: What is frequency of an offense during each hour of the day?
