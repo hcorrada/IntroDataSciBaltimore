@@ -536,13 +536,14 @@ Note: because there were no dates associated with when buildings became vacant
 January 2015 to minimize the number of "extra" vacant buildings. We assume that
 there was not a significant number of new vacant buildings added since the month
 of January.
+
 #### Zach Jiroun, Jose Zamora, Des Chandhok
 
 What question are you asking?:
 
 What is the female to male ratio of different types of crimes on Valentine's Day, 2011?
 
-```{r}
+```{r ZachJiroun}
 
 library(plyr)
 vdaytab <- table(incident=arrest_tab$incidentOffense,sex=arrest_tab$sex,date=arrest_tab$arrestDate=="02/14/2011")
