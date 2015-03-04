@@ -648,3 +648,24 @@ After looking at graphs for each year specifically, it looks like crime rises to
 
 However, it does look like the rate of crime for this time period increased right in the middle. In the year-separated-graph for Narcotics, the end of 2011 had clearly higher levels than the start of 2011, and the start of 2012 was higher than the end of 2012. This could be attributed to lower levels of employment in that time
 
+#### Albert Koy
+
+#####What question are you asking?
+Do people commit fewer crimes during the holidays?
+
+#####What is the code you use to answer it?
+
+```{r Albert}
+(function() {
+  source("calendarHeat_modified.R")
+
+  arrest_tab=read.csv("BPD_Arrests.csv", stringsAsFactors=FALSE)
+  arrest_counts_tab <- table(arrest_tab$arrestDate)
+  arrest_counts_df <- data.frame(date=as.Date(names(arrest_counts_tab), "%m/%d/%Y"), num_arrests=as.vector(arrest_counts_tab))
+
+  calendarHeat(arrest_counts_df$date, arrest_counts_df$num_arrests, color="g2r", varname="Number of Arrests Per Day")
+})()
+```
+
+#####What did you observe? 
+Looking at the heat map for 2011 and 2012, there is a very distinct reduction in number of arrests on Thanksgiving (the fourth Thursday of November). Moreover, on Christmas (the last Sunday of December in 2011 and the last Tuesday of December in 2012) and the days leading up to Christmas, we observe green squares as well. It's hard to tell whether this reduction in arrests is due to fewer officers working on the holidays or due to fewer crimes being committed. In making this judgement, it would be useful to have data on the number of officers working each day.
