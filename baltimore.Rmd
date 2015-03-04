@@ -687,3 +687,46 @@ barplot(num_of_arrests, main="Number of Arrests for 4th of July and Christmas", 
 
 What did you observe?: There are actually mixed results. For the 4th of July, there were more arrests in 2012(132) than in 2011(113). For Christmas, there were more arrests in 2011(53) than in 2012(43). There are many more arrests on the 4th of July for both years.
 
+
+#### James Collins, Beshad Talayminaei
+
+What are you asking:
+
+We wanted to answer this question: What percentage of crime per sex is theft related? In other words; if you are arrested as a male what are the odds that your offense was theft related? Does this proportion change if you are female? To answer this we divide the total number of theft related crimes per sex by the total number of crimes per sex. For the purposes of this question we filter out unknown offenses and unknown sexes.
+
+What is the code you used to answer it?
+```{r jbcollins-1}
+
+theft_regex <- regexpr("burg|stolen|robb|larceny", arrest_tab$incidentOffense, ignore.case=T, perl=T)
+totalTab <- table(arrest_tab$incidentOffense[arrest_tab$sex != "" & arrest_tab$incidentOffense != "Unknown Offense"], arrest_tab$sex[arrest_tab$sex != "" & arrest_tab$incidentOffense != "Unknown Offense"])
+robbTab <- table(arrest_tab$incidentOffense[theft_regex > -1], arrest_tab$sex[theft_regex > -1])
+robbSum <- colSums(robbTab)
+totalSum <- colSums(totalTab)
+robbData <- data.frame(Female = robbSum[1], Male = robbSum[2])
+totalData <- data.frame(Female = totalSum[1], Male = totalSum[2])
+theftFemaleProp <- (robbData$Female / totalData$Female) * 100
+theftMaleProp <- (robbData$Male / totalData$Male) * 100
+theftFemaleProp
+theftMaleProp
+```
+What did you observe? We were suprised to see that females are more likely to be arrested for a theft related crime. This is mainly due to the larceny arrests.
+
+```{r jbcollins-2}
+larceny_regex <- regexpr("larceny", arrest_tab$incidentOffense, ignore.case=T, perl=T)
+larcenyTab <- table(arrest_tab$incidentOffense[larceny_regex > -1], arrest_tab$sex[larceny_regex > -1])
+larcenySum <- colSums(larcenyTab)
+totalSum <- colSums(totalTab)
+larcenyData <- data.frame(Female = larcenySum[1], Male = larcenySum[2])
+totalData <- data.frame(Female = totalSum[1], Male = totalSum[2])
+larcFemaleProp <- (larcenyData$Female / totalData$Female) * 100
+larcMaleProp <- (larcenyData$Male / totalData$Male) * 100
+larcFemaleProp
+larcMaleProp
+slices <- c(theftFemaleProp, theftMaleProp)
+lbls <- c("Female", "Male")
+pie(slices, labels = lbls, main="Theft")
+slices <- c(larcFemaleProp, larcMaleProp)
+lbls <- c("Female", "Male")
+pie(slices, labels = lbls, main="Larceny")
+```
+
