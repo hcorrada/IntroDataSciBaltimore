@@ -922,6 +922,7 @@ hist(arrest_tab$monthDay, breaks=365, xlab="Day of the Year", ylab="Number of Ar
 What did you observe?
 
 I found that the number of arrests seems to peak around early May and late September, with less around early July, late February, and around Christmas and New Years.
+
 #### Max Burns
 
 What question are you asking?:
@@ -933,6 +934,7 @@ I plan to separate age into age groups and use that and the gender as different 
 What is the code you use to answer it?:
 
 ```{r burns}
+(function () {
 arrest_tab = read.csv("BPD_Arrests.csv", stringsAsFactors=FALSE)
 tmp=arrest_tab$sex
 arrest_tab$sex=arrest_tab$race
@@ -992,7 +994,7 @@ myResult$f41to55 <- f41to55$count
 df<- melt(myResult, id.vars='hour', variable_name = 'demographic', measure.vars=c("m18to25","f18to25","m26to40","f26to40","m41to55","f41to55"))
 	
 ggplot(data=df, aes(x=hour,y=value)) + geom_line(aes(colour = variable)) +xlab("Hour of Day") + ylab("Count(Logarithmic") + ggtitle("Hour of Day vs Arrest Count by Age Group and Sex") + labs(colour="Demographic") + scale_y_log10()
-
+})()
 ```
 
 What did you observe?
