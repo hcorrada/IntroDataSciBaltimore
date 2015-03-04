@@ -695,7 +695,7 @@ What are you asking:
 We wanted to answer this question: What percentage of crime per sex is theft related? In other words; if you are arrested as a male what are the odds that your offense was theft related? Does this proportion change if you are female? To answer this we divide the total number of theft related crimes per sex by the total number of crimes per sex. For the purposes of this question we filter out unknown offenses and unknown sexes.
 
 What is the code you used to answer it?
-```{r}
+```{r jbcollins-1}
 
 theft_regex <- regexpr("burg|stolen|robb|larceny", arrest_tab$incidentOffense, ignore.case=T, perl=T)
 totalTab <- table(arrest_tab$incidentOffense[arrest_tab$sex != "" & arrest_tab$incidentOffense != "Unknown Offense"], arrest_tab$sex[arrest_tab$sex != "" & arrest_tab$incidentOffense != "Unknown Offense"])
@@ -711,7 +711,7 @@ theftMaleProp
 ```
 What did you observe? We were suprised to see that females are more likely to be arrested for a theft related crime. This is mainly due to the larceny arrests.
 
-```{r}
+```{r jbcollins-2}
 larceny_regex <- regexpr("larceny", arrest_tab$incidentOffense, ignore.case=T, perl=T)
 larcenyTab <- table(arrest_tab$incidentOffense[larceny_regex > -1], arrest_tab$sex[larceny_regex > -1])
 larcenySum <- colSums(larcenyTab)
@@ -729,3 +729,4 @@ slices <- c(larcFemaleProp, larcMaleProp)
 lbls <- c("Female", "Male")
 pie(slices, labels = lbls, main="Larceny")
 ```
+
