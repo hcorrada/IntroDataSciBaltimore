@@ -899,3 +899,26 @@ ipersons()
 
 What did you observe? 
 I observed that arrests peak in the middle of the week, with the weekend having the least arrests. It would be interesting to study the types of crimes committed throughout the week to see if all crimes follow this pattern or not.
+
+
+
+#### Richard Rice
+
+What question are you asking?:
+
+What time of the year has the most and least amount of arrests?
+
+What is the code you use to answer it?:
+```{r RichardRice}
+(function() {
+arrest_tab$date <- as.POSIXlt(strptime(arrest_tab$arrestDate, "%m/%d/%Y"))
+
+arrest_tab$monthDay <- as.POSIXlt(strptime(format(arrest_tab$date, format="%m-%d"), "%m-%d"))
+
+hist(arrest_tab$monthDay, breaks=365, xlab="Day of the Year", ylab="Number of Arrests", main="Arrest Frequency Over A Year")
+})()
+```
+
+What did you observe?
+
+I found that the number of arrests seems to peak around early May and late September, with less around early July, late February, and around Christmas and New Years.
